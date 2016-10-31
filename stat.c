@@ -10,47 +10,70 @@ int main(){
   struct stat *buf = (struct stat *)malloc(sizeof(struct stat));
   int a = stat("stat", buf);
   close(fd);
-  printf("File size: %d B\n",(buf -> st_size) * 10);
+  int size = buf -> st_size;
+  printf("File size: %d\n", size);
+  printf("File size(human readable): ");
+  if (size == 0)
+    printf("%d B", size);
+  if (size > 1000000000){
+    printf("%d GB ", size / 1000000000);
+    size = size % 1000000000;
+  }
+  if (size > 1000000){
+    printf("%d MB ", size / 1000000);
+    size = size % 1000000;
+  }
+  if (size > 1000){
+    printf("%d KB ", size / 1000);
+    size = size % 1000;
+  }
+  if (size > 0){
+    printf("%d B", size);
+    size = 0;
+  }
+  printf("\n");
   int stmode = buf ->st_mode;
   printf("Mode(permissions): %d\n", stmode);
-  char mode[9];
+  char mode[10];
   if (stmode & S_IRUSR)
-    mode [1] = 'r';
+    mode [0] = 'r';
+  else
+    mode [0] = '-';
+  if (stmode & S_IWUSR)
+    mode [1] = 'w';
   else
     mode [1] = '-';
-  if (stmode & S_IWUSR)
-    mode [2] = 'w';
+  if (stmode & S_IXUSR)
+    mode [2] = 'x';
   else
     mode [2] = '-';
-  if (stmode & S_IXUSR)
-    mode [3] = 'x';
+  if (stmode & S_IRGRP)
+    mode [3] = 'r';
   else
     mode [3] = '-';
-  if (stmode & S_IRGRP)
-    mode [4] = 'r';
+  if (stmode & S_IWGRP)
+    mode [4] = 'w';
   else
     mode [4] = '-';
-  if (stmode & S_IWGRP)
-    mode [5] = 'w';
+  if (stmode & S_IXGRP)
+    mode [5] = 'x';
   else
     mode [5] = '-';
-  if (stmode & S_IXGRP)
-    mode [6] = 'x';
+  if (stmode & S_IROTH)
+    mode [6] = 'r';
   else
     mode [6] = '-';
-  if (stmode & S_IROTH)
-    mode [7] = 'r';
+  if (stmode & S_IWOTH)
+    mode [7] = 'w';
   else
     mode [7] = '-';
-  if (stmode & S_IWOTH)
-    mode [8] = 'w';
+  if (stmode & S_IXOTH)
+    mode [8] = 'x';
   else
     mode [8] = '-';
-  if (stmode & S_IXOTH)
-    mode [9] = 'x';
-  else
-    mode [9] = '-';
+  mode[9] = 0;
   printf("Mode(ls -l form): %s\n", mode);
   printf("Time of last access: %s", ctime(&buf -> st_atime));
   return 0;
-}  
+  free(buf);
+} 
